@@ -1,0 +1,10 @@
+; $Id $
+name = CiviCRM Token
+description = Provides additional Contact tokens for CiviCRM.
+dependencies[] = civicrm
+dependencies[] = token
+core = 6.x
+
+version = "6.x-1.0"
+project = "CiviCRM"
+
