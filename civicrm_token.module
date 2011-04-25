@@ -71,7 +71,7 @@ function civicrm_token_token_values($type, $object = NULL) {
       $contact = (object)$object;
       
       // TODO remove
-      dpm($contact);
+//      dpm($contact);
       
       if ( $contact->id ) { 
         // Contact tokens.
