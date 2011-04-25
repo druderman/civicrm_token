@@ -16,77 +16,45 @@
  */
 function civicrm_token_token_list($type = 'all') {
   $tokens = array();
-
+  
   if ($type == 'contact' || $type == 'all') {
+
+    $civicrm_root = drupal_get_path('module', 'civicrm') . '/..';    
+    require_once $civicrm_root . '/civicrm.config.php';
+    require_once $civicrm_root . '/CRM/Core/Config.php';
+    require_once $civicrm_root . '/api/v2/Contact.php';
+
     // Contact tokens
-    $tokens['contact']['id'] = t('Contact id.');
-    $tokens['contact']['first-name'] = t('First name.');
-    $tokens['contact']['middle-name'] = t('Middle name.');
-    $tokens['contact']['last-name'] = t('Last name.');
-    $tokens['contact']['email'] = t('Email.');
-    $tokens['contact']['contact-type'] = t('Contact type.');    
-    $tokens['contact']['contact-sub-type'] = t('Contact sub_type.');
-    $tokens['contact']['do-not-email'] = t('Privacy do_not_email.');
-    $tokens['contact']['do-not-phone'] = t('Privacy do_not_phone.');
-    $tokens['contact']['do-not-mail'] = t('Privacy do_not_mail.');
-    $tokens['contact']['do-not-sms'] = t('Privacy do_not_sms.');
-    $tokens['contact']['do-not-trade'] = t('Privacy do_not_trade.');
-    $tokens['contact']['is-opt-out'] = t('Privacy is_opt_out.');
-    $tokens['contact']['legal-identifier'] = t('Legal identifier.');
-    $tokens['contact']['external-identifier'] = t('External identifier');
-    $tokens['contact']['sort-name'] = t('Sort name.');
-    $tokens['contact']['display-name'] = t('Display name.');
-    $tokens['contact']['nick-name'] = t('Nickname.');
-    $tokens['contact']['legal-name'] = t('Legal name.');
-    $tokens['contact']['image-url'] = t('Optional contact image URL.');
-    $tokens['contact']['preferred-communication-method'] = t('Preferred communication method.');
-    $tokens['contact']['preferred-language'] = t('Preferred language.');
-    $tokens['contact']['preferred-mail-format'] = t('Preferred mail format.');
-    $tokens['contact']['source'] = t('Source of the contact e.g. import.');
-    $tokens['contact']['prefix-id'] = t('Prefix or Title for name (Ms, Mr...).');
-    $tokens['contact']['suffix-id'] = t('Suffix for name (Jr, Sr...).');
-    $tokens['contact']['email-greeting-id'] = t('Email greeting id.');
-    $tokens['contact']['email-greeting-custom'] = t('Email greeting custom.');
-    $tokens['contact']['email-greeting-display'] = t('Email greeting display.');
-    $tokens['contact']['postal-greeting-id'] = t('Postal greeting id.');
-    $tokens['contact']['postal-greeting-custom'] = t('Postal greeting custom.');
-    $tokens['contact']['postal-greeting-display'] = t('Postal greeting display.');
-    $tokens['contact']['addressee-id'] = t('Addressee id.');
-    $tokens['contact']['addressee-custom'] = t('Addressee custom.');
-    $tokens['contact']['addressee-display'] = t('Addressee display.');
-    $tokens['contact']['job-title'] = t('Job title.');
-    $tokens['contact']['gender-id'] = t('Gender id.');
-    $tokens['contact']['birth-date'] = t('Birth date.');
-    $tokens['contact']['is-deceased'] = t('Is deceased.');
-    $tokens['contact']['deceased-date'] = t('Deceased date.');
-    $tokens['contact']['household-name'] = t('Household name.');
-    $tokens['contact']['primary-contact-id'] = t('Primary contact id.');
-    $tokens['contact']['organization-name'] = t('Organization name.');    
-    $tokens['contact']['sic-code'] = t('SIC (Standard Industry Classification) Code.');
-    $tokens['contact']['user-unique-id'] = t('OpenID or unique identifier used for logging in.');
-    $tokens['contact']['employer-id'] = t('Employer id.');
-    $tokens['contact']['is-deleted'] = t('Is deleted.');
+    $contactFields =& CRM_Contact_DAO_Contact::fields( );
+    foreach ($contactFields as $field) {
+      if ($field['export']) {
+        $tokens['contact'][$field['name']] = $field['title'];
+      }
+    }
+    
     // Address tokens
-    $tokens['contact']['address-location-type-id'] = t('Address location_type_id.');
-    $tokens['contact']['address-is-primary'] = t('Address is_primary.');
-    $tokens['contact']['address-is-billing'] = t('Address is_billing.');
-    $tokens['contact']['address-street-address'] = t('Address street_address.');
-    $tokens['contact']['address-supplemental-address_1'] = t('Address supplemental_address_1.');
-    $tokens['contact']['address-supplemental-address_2'] = t('Address supplemental_address_2.');
-    $tokens['contact']['address-supplemental-address_3'] = t('Address supplemental_address_3.');
-    $tokens['contact']['address-city'] = t('Address city.');
-    $tokens['contact']['address-county_id'] = t('Address county_id.');
-    $tokens['contact']['address-state-province-id'] = t('Address state_province_id.');
-    $tokens['contact']['address-postal-code'] = t('Address postal_code.');
-    $tokens['contact']['address-postal-code-suffix'] = t('Address postal_code_suffix.');
-    $tokens['contact']['address-country-id'] = t('Address country_id.');
-    $tokens['contact']['address-latitude'] = t('Address latitude.');
-    $tokens['contact']['address-longitude'] = t('Address longitude.');
-    $tokens['contact']['address-timezone'] = t('Address timezone.');
+    $addressFields =& CRM_Core_DAO_Address::fields( );
+    foreach ($addressFields as $field) {
+      if ($field['export']) {
+        $tokens['contact']['address_'.$field['name']] = $field['title'];
+      }
+    }
+    
     // Email tokens
-    $tokens['contact']['email-primary'] = t('Primary email.');    
+    $emailFields =& CRM_Core_DAO_Email::fields( );
+    foreach ($emailFields as $field) {
+      if ($field['export']) {
+        $tokens['contact']['email_'.$field['name']] = $field['title'];
+      }
+    }
+    
     // Phone tokens
-    $tokens['contact']['phone-primary'] = t('Primary phone.');
+    $phoneFields =& CRM_Core_DAO_Phone::fields( );
+    foreach ($phoneFields as $field) {
+      if ($field['export']) {
+        $tokens['contact']['phone_'.$field['name']] = $field['title'];
+      }
+    }
     
   }
 
@@ -107,54 +75,13 @@ function civicrm_token_token_values($type, $object = NULL) {
       
       if ( $contact->id ) { 
         // Contact tokens.
-        // see CRM/Contact/DAO/Contact.PHP for field definitions        
-        $values['id'] = $contact->id;
-        $values['first-name'] = $contact->first_name;
-        $values['middle-name'] = $contact->middle_name;
-        $values['last-name'] = $contact->last_name;
-        $values['email'] = $contact->email;
-        $values['contact-type'] = $contact->contact_type;
-        $values['contact-sub-type'] = $contact->contact_sub_type;
-        $values['do-not-email'] = $contact->do_not_email;
-        $values['do-not-phone'] = $contact->do_not_phone;
-        $values['do-not-mail'] = $contact->do_not_mail;
-        $values['do-not-sms'] = $contact->do_not_sms;
-        $values['do-not-trade'] = $contact->do_not_trade;
-        $values['is-opt-out'] = $contact->is_opt_out;
-        $values['legal-identifier'] = $contact->legal_identifier;
-        $values['external-identifier'] = $contact->external_identifier;
-        $values['sort-name'] = $contact->sort_name;
-        $values['display-name'] = $contact->display_name;
-        $values['nick-name'] = $contact->nick_name;
-        $values['legal-name'] = $contact->legal_name;
-        $values['image-url'] = $contact->image_URL;
-        $values['preferred-communication-method'] = $contact->preferred_communication_method;
-        $values['preferred-language'] = $contact->preferred_language;
-        $values['preferred-mail-format'] = $contact->preferred_mail_format;
-        $values['source'] = $contact->source;
-        $values['prefix-id'] = $contact->prefix_id;
-        $values['suffix-id'] = $contact->suffix_id;
-        $values['email-greeting-id'] = $contact->email_greeting_id;
-        $values['email-greeting-custom'] = $contact->email_greeting_custom;
-        $values['email-greeting-display'] = $contact->email_greeting_display;
-        $values['postal-greeting-id'] = $contact->postal_greeting_id;
-        $values['postal-greeting-custom'] = $contact->postal_greeting_custom;
-        $values['postal-greeting-display'] = $contact->postal_greeting_display;
-        $values['addressee-id'] = $contact->addressee_id;
-        $values['addressee-custom'] = $contact->addressee_custom;
-        $values['addressee-display'] = $contact->addressee_display;
-        $values['job-title'] = $contact->job_title;
-        $values['gender-id'] = $contact->gender_id;
-        $values['birth-date'] = $contact->birth_date;
-        $values['is-deceased'] = $contact->is_deceased;
-        $values['deceased-date'] = $contact->deceased_date;
-        $values['household-name'] = $contact->household_name;
-        $values['primary-contact-id'] = $contact->primary_contact_id;
-        $values['organization-name'] = $contact->organization_name;
-        $values['sic-code'] = $contact->sic_code;
-        $values['user-unique-id'] = $contact->user_unique_id;    
-        $values['employer-id'] = $contact->employer_id;
-        $values['is-deleted'] = $contact->is_deleted;
+        // see CRM/Contact/DAO/Contact.PHP for field definitions
+        $contactFields =& CRM_Contact_DAO_Contact::fields( );
+        foreach ($contactFields as $field) {
+          if ($field['export']) {
+            $values[$field['name']] = $contact->$field['name'];
+          }
+        }        
         
         // Address tokens
         // See CRM/Core/DAO/Address.PHP for field definitions
@@ -167,64 +94,44 @@ function civicrm_token_token_values($type, $object = NULL) {
               break;                  
             }
           }
+          
           if (isset($address)) {
-            $values['address-location-type-id'] = $address->location_type_id;
-            $values['address-is-primary'] = $address->is_primary;
-            $values['address-is-billing'] = $address->is_billing;
-            $values['address-street-address'] = $address->street_address;
-            $values['address-supplemental-address_1'] = $address->supplemental_address_1;
-            $values['address-supplemental-address_2'] = $address->supplemental_address_2;
-            $values['address-supplemental-address_3'] = $address->supplemental_address_3;
-            $values['address-city'] = $address->city;
-            $values['address-county_id'] = $address->county_id;
-            $values['address-state-province-id'] = $address->state_province_id;
-            $values['address-postal-code'] = $address->postal_code;
-            $values['address-postal-code-suffix'] = $address->postal_code_suffix;
-            $values['address-country-id'] = $address->country_id;
-            $values['address-latitude'] = $address->geo_code_1;
-            $values['address-longitude'] = $address->geo_code_2;
-            $values['address-timezone'] = $address->timezone;
-          } else {
-            // Token prefers empty tokens
-            $values['address-location-type-id'] = NULL;
-            $values['address-is-primary'] = NULL;
-            $values['address-is-billing'] = NULL;
-            $values['address-street-address'] = NULL;
-            $values['address-supplemental-address_1'] = NULL;
-            $values['address-supplemental-address_2'] = NULL;
-            $values['address-supplemental-address_3'] = NULL;
-            $values['address-city'] = NULL;
-            $values['address-county_id'] = NULL;
-            $values['address-state-province-id'] = NULL;
-            $values['address-postal-code'] = NULL;
-            $values['address-postal-code-suffix'] = NULL;
-            $values['address-country-id'] = NULL;
-            $values['address-latitude'] = NULL;
-            $values['address-longitude'] = NULL;
-            $values['address-timezone'] = NULL;            
+            // figure out which fields to return
+            $addressFields =& CRM_Core_DAO_Address::fields( );        
+            foreach ($addressFields as $field) {
+              if ($field['export']) {
+                $values['address_'. $field['name']] = $address->$field['name'];
+              }
+            }
           }
-        }            
+        }
+        
         // Phone tokens
         // See CRM/Core/DAO/Phone.PHP for field definitions
-        // Only first or primary phone is returned
+        // find the first or primary phone
         if (isset($contact->phone)) {
           foreach ($contact->phone as $cphone) {
-            if ($cphone->is_primary)
-            {
+            if ($cphone->is_primary) {
               $phone = $cphone;
               break;                  
             }
           }
+          
+         // set return value
           if (isset($phone)) {
-            $values['phone-primary'] = $phone->phone;            
-          } else {
-            // Token prefers empty tokens
-            $values['phone-primary'] = NULL;            
+            // figure out which fields to return
+            $phoneFields =& CRM_Core_DAO_Phone::fields( );            
+            foreach ($phoneFields as $field) {
+              if ($field['export']) {
+                $values['phone_'. $field['name']] = $phone->$field['name'];
+              }
+            }
           }
-        }   
+        }
+        
         // Email tokens
-        // See CRM/Core/DAO/Email.PHP for field definitions
-        // Only first or primary email is returned
+        // See CRM/Core/DAO/Email.PHP for field definitions        
+        // find first or primary email
         if (isset($contact->email)) {
           foreach ($contact->email as $cemail) {
             if ($cemail->is_primary)
@@ -233,13 +140,18 @@ function civicrm_token_token_values($type, $object = NULL) {
               break;                  
             }
           }
-          if (isset($email)) {
-            $values['email-primary'] = $email->email;            
-          } else {
-            // Token prefers empty tokens
-            $values['email-primary'] = NULL;
-          }
+         // set return value
+          if (isset($email)) {            
+            // figure out which fields to return
+            $emailFields =& CRM_Core_DAO_Email::fields( );
+            foreach ($emailFields as $field) {
+              if ($field['export']) {
+                $values['email_'. $field['name']] = $email->$field['name'];
+              }
+            }
+          }          
         }
+        
       }
       // TODO add more...      
       break;      
